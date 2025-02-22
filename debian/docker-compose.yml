@@ -32,14 +32,12 @@ services:
   nginx:
     image: nginx:alpine
     restart: unless-stopped
-    ports:
-      - "80:80"
     volumes:
       - ./nginx:/etc/nginx/conf.d:ro
       - app_public:/var/www/html/public:ro
       - app_storage:/var/www/html/storage:ro
     networks:
-      - app-network
+      - dokploy-network
     depends_on:
       - app
     logging: *default-logging
@@ -57,7 +55,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - app-network
+      - dokploy-network
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}" ]
       interval: 10s
@@ -71,7 +69,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - app-network
+      - dokploy-network
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
@@ -80,8 +78,8 @@ services:
     logging: *default-logging
 
 networks:
-  app-network:
-    driver: bridge
+  dokploy-network:
+    external: true
 
 volumes:
   app_cache:
